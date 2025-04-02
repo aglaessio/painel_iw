@@ -513,20 +513,32 @@
 
             // Configurações
             const CORRECT_PASSWORD = "Maria.191290";
-            const FIXED_LINK = {
-                id: "fixed-link",
-                name: "Solicitação de Recursos",
-                url: "https://aglaessio.github.io/sr_iw/"
-            };
+            const FIXED_LINKS = [
+                {
+                    id: "fixed-link-1",
+                    name: "Solicitação de Recursos",
+                    url: "https://aglaessio.github.io/sr_iw/"
+                },
+                {
+                    id: "fixed-link-2",
+                    name: "Orçamento de Compras de Itens Diversos",
+                    url: "https://aglaessio.github.io/orcamento_iw/"
+                }
+            ];
 
             // Estado da aplicação
             let links = JSON.parse(localStorage.getItem('quickLinks')) || [];
             let linkToDeleteId = null;
             let passwordAction = 'add'; // 'add' or 'delete'
 
-            // Adicionar link fixo se não existir
-            if (!links.some(link => link.id === FIXED_LINK.id)) {
-                links.unshift(FIXED_LINK);
+            // Adicionar links fixos se não existirem
+            FIXED_LINKS.forEach(fixedLink => {
+                if (!links.some(link => link.id === fixedLink.id)) {
+                    links.unshift(fixedLink);
+                }
+            });
+            
+            if (links.length > FIXED_LINKS.length) {
                 saveLinks();
             }
 
@@ -534,7 +546,14 @@
             function renderLinks() {
                 linksContainer.innerHTML = '';
                 
-                links.forEach(link => {
+                // Ordenar links (fixos primeiro)
+                const sortedLinks = [...links].sort((a, b) => {
+                    const isAFixed = FIXED_LINKS.some(fl => fl.id === a.id);
+                    const isBFixed = FIXED_LINKS.some(fl => fl.id === b.id);
+                    return isBFixed - isAFixed;
+                });
+                
+                sortedLinks.forEach(link => {
                     const linkCard = document.createElement('div');
                     linkCard.className = 'link-card';
                     
@@ -542,7 +561,7 @@
                         <div class="link-title">${link.name}</div>
                         <div class="link-actions">
                             <button class="action-btn open-btn">Abrir</button>
-                            ${link.id !== FIXED_LINK.id ? '<button class="action-btn delete-btn" data-id="' + link.id + '">Excluir</button>' : ''}
+                            ${!FIXED_LINKS.some(fl => fl.id === link.id) ? '<button class="action-btn delete-btn" data-id="' + link.id + '">Excluir</button>' : ''}
                         </div>
                     `;
                     
@@ -558,8 +577,8 @@
                         window.open(link.url, '_blank');
                     });
                     
-                    // Adicionar evento de clique para excluir o link (se não for o fixo)
-                    if (link.id !== FIXED_LINK.id) {
+                    // Adicionar evento de clique para excluir o link (se não for fixo)
+                    if (!FIXED_LINKS.some(fl => fl.id === link.id)) {
                         const deleteBtn = linkCard.querySelector('.delete-btn');
                         deleteBtn.addEventListener('click', (e) => {
                             e.stopPropagation();
