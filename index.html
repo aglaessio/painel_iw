@@ -110,6 +110,7 @@
             border: 1px solid rgba(0, 0, 0, 0.03);
             position: relative;
             overflow: hidden;
+            cursor: pointer;
         }
 
         .link-card:hover {
@@ -135,16 +136,9 @@
 
         .link-title {
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 16px;
             color: var(--text-color);
             font-size: 1.1rem;
-        }
-
-        .link-url {
-            font-size: 0.8rem;
-            color: var(--text-light);
-            margin-bottom: 16px;
-            word-break: break-all;
         }
 
         .link-actions {
@@ -546,7 +540,6 @@
                     
                     linkCard.innerHTML = `
                         <div class="link-title">${link.name}</div>
-                        <div class="link-url">${link.url}</div>
                         <div class="link-actions">
                             <button class="action-btn open-btn">Abrir</button>
                             ${link.id !== FIXED_LINK.id ? '<button class="action-btn delete-btn" data-id="' + link.id + '">Excluir</button>' : ''}
@@ -557,6 +550,11 @@
                     const openBtn = linkCard.querySelector('.open-btn');
                     openBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
+                        window.open(link.url, '_blank');
+                    });
+                    
+                    // Adicionar evento de clique no card para abrir o link
+                    linkCard.addEventListener('click', () => {
                         window.open(link.url, '_blank');
                     });
                     
